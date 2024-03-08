@@ -1,3 +1,5 @@
+use bevy::ecs::component::Component;
+
 const MIN_ROWS_ERROR: &str = "Grid row must have a minimum length of 2";
 const MIN_COLS_ERROR: &str = "Grid column must have a minimum length of 2";
 const COLS_LEN_CONSISTENCY_ERROR: &str = "All grid columns must be of the same length";
@@ -7,13 +9,17 @@ const MIN_COLS: usize = 2;
 
 type Grid = Vec<Vec<u8>>;
 
-pub struct World {
+#[derive(Component)]
+pub struct DullWorld {
     rows: usize,
     cols: usize,
     grid: Grid,
 }
 
-impl World {
+impl DullWorld {
+    pub fn get_grid(&self) -> &Grid {
+        &self.grid
+    }
     pub fn from_config(grid: Grid) -> Result<Self, String> {
         let rows = grid.len();
 
@@ -105,14 +111,14 @@ mod test {
 
     #[test]
     fn it_should_not_create_world_if_rows_too_small() {
-        let result = World::from_config(vec![vec![]]);
+        let result = DullWorld::from_config(vec![vec![]]);
         assert!(result.is_err());
         assert_eq!(result.err().unwrap(), MIN_ROWS_ERROR);
     }
 
     #[test]
     fn it_should_not_create_world_if_cols_too_small() {
-        let result = World::from_config(vec![vec![0], vec![0]]);
+        let result = DullWorld::from_config(vec![vec![0], vec![0]]);
 
         assert!(result.is_err());
         assert_eq!(result.err().unwrap(), MIN_COLS_ERROR);
@@ -120,7 +126,7 @@ mod test {
 
     #[test]
     fn it_should_not_create_world_if_cols_len_are_inconsitent() {
-        let result = World::from_config(vec![vec![0, 0], vec![0, 0, 0]]);
+        let result = DullWorld::from_config(vec![vec![0, 0], vec![0, 0, 0]]);
 
         assert!(result.is_err());
         assert_eq!(result.err().unwrap(), COLS_LEN_CONSISTENCY_ERROR);
@@ -128,7 +134,7 @@ mod test {
 
     #[test]
     fn it_should_create_world() {
-        let result = World::from_config(vec![vec![1; 3]; 2]);
+        let result = DullWorld::from_config(vec![vec![1; 3]; 2]);
 
         assert!(result.is_ok());
         assert_eq!(result.unwrap().grid, vec![vec![1, 1, 1], vec![1, 1, 1]]);
@@ -138,7 +144,7 @@ mod test {
     #[test]
     fn it_should_die_if_less_than_two_live_neighbours() {
         let config = vec![vec![0, 0, 0], vec![0, 1, 0], vec![0, 0, 0]];
-        let result = World::from_config(config);
+        let result = DullWorld::from_config(config);
 
         assert!(result.is_ok());
         let mut world = result.unwrap();
@@ -153,7 +159,7 @@ mod test {
     #[test]
     fn it_should_not_die_if_two_or_three_live_neighbours() {
         let config = vec![vec![0, 0, 0], vec![0, 1, 0], vec![0, 0, 0]];
-        let result = World::from_config(config);
+        let result = DullWorld::from_config(config);
 
         assert!(result.is_ok());
         let mut world = result.unwrap();
@@ -174,7 +180,7 @@ mod test {
             vec![0, 0, 1, 0, 0],
             vec![0, 0, 0, 0, 0],
         ];
-        let result = World::from_config(config);
+        let result = DullWorld::from_config(config);
 
         assert!(result.is_ok());
         let mut world = result.unwrap();
@@ -201,7 +207,7 @@ mod test {
             vec![0, 0, 1, 0, 0],
             vec![0, 0, 0, 0, 0],
         ];
-        let result = World::from_config(config);
+        let result = DullWorld::from_config(config);
 
         assert!(result.is_ok());
         let mut world = result.unwrap();
