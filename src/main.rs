@@ -1,9 +1,12 @@
 use bevy::{
     prelude::*,
+    render::camera::ScalingMode,
     sprite::{MaterialMesh2dBundle, Mesh2dHandle},
 };
+use plugins::dl_window::DullLifeWindowPlugin;
 use world::DullWorld;
 
+mod plugins;
 mod world;
 
 #[derive(Resource)]
@@ -17,6 +20,7 @@ fn setup_world(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
+    // dull world
     let dull_world = DullWorld::from_config(vec![
         vec![0, 0, 0, 0, 0],
         vec![0, 0, 1, 0, 0],
@@ -42,7 +46,11 @@ fn setup_world(
     }
 
     commands.spawn(dull_world);
-    commands.spawn(Camera2dBundle::default());
+
+    // Camera
+    let mut camera = Camera2dBundle::default();
+    camera.projection.scaling_mode = ScalingMode::FixedVertical(1000.0);
+    commands.spawn(camera);
 }
 
 fn update_world(time: Res<Time>, mut timer: ResMut<StepTimer>, mut query: Query<&mut DullWorld>) {
@@ -58,7 +66,7 @@ fn render_world() {}
 fn main() {
     App::new()
         .insert_resource(StepTimer(Timer::from_seconds(0.5, TimerMode::Repeating)))
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DullLifeWindowPlugin)
         .add_systems(Startup, setup_world)
         .add_systems(Update, update_world)
         .add_systems(PostUpdate, render_world)
