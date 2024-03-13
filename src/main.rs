@@ -62,15 +62,15 @@ fn setup_world(
 
     let (row_len, col_len) = dull_world.dimensions();
 
-    for (row_index, row) in dull_world.get_grid().iter().enumerate() {
-        for (col_index, cell) in row.iter().enumerate() {
+    for row_index in 0..row_len {
+        for col_index in 0..col_len {
             commands.spawn((
                 MaterialMesh2dBundle {
                     mesh: Mesh2dHandle(meshes.add(Rectangle::new(10., 10.))),
-                    material: if *cell == 0 {
-                        dead_color_handle.clone()
-                    } else {
+                    material: if dull_world.is_live(row_index, col_index) {
                         live_color_handle.clone()
+                    } else {
+                        dead_color_handle.clone()
                     },
                     transform: Transform::from_xyz(
                         (row_index as f32 - row_len as f32 / 2.) * 10.,
@@ -110,9 +110,8 @@ fn render_world(
     q_live_cell_color: Res<CellLiveColor>,
 ) {
     let dull_world = q_dull_world.iter().next().unwrap();
-    let grid = dull_world.get_grid();
     for (mut entity, cell) in q_entities.iter_mut() {
-        if grid[cell.row_index][cell.col_index] == 0 {
+        if dull_world.is_live(cell.row_index, cell.col_index) {
             *entity = q_dead_cell_color.0.clone();
         } else {
             *entity = q_live_cell_color.0.clone();
