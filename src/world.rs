@@ -17,9 +17,14 @@ pub struct DullWorld {
 }
 
 impl DullWorld {
+    pub fn dimensions(&self) -> (usize, usize) {
+        (self.rows, self.cols)
+    }
+
     pub fn get_grid(&self) -> &Grid {
         &self.grid
     }
+
     pub fn from_config(grid: Grid) -> Result<Self, String> {
         let rows = grid.len();
 
@@ -51,7 +56,7 @@ impl DullWorld {
 
         let row_plus_one = (row + 1) % self.rows;
         let row_minus_one = (row + self.rows - 1) % self.rows;
-        let col_plus_one = (col + 1) % self.rows;
+        let col_plus_one = (col + 1) % self.cols;
         let col_minus_one = (col + self.cols - 1) % self.cols;
 
         self.grid[row_minus_one][col_minus_one]
