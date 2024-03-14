@@ -6,7 +6,7 @@ use bevy::{
 const WIDTH_RATIO: f32 = 16.0;
 const HEIGHT_RATIO: f32 = 9.0;
 
-const MIN_WIDTH: f32 = 1200.0;
+const MIN_WIDTH: f32 = 2400.0;
 const MIN_HEIGHT: f32 = MIN_WIDTH * HEIGHT_RATIO / WIDTH_RATIO;
 
 fn sync_dimensions(mut windows: Query<&mut Window>) {

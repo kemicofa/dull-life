@@ -16,7 +16,7 @@ mod world;
 
 const ROWS: usize = 120;
 const COLS: usize = 240;
-const THRESHOLD_FOR_INITIAL_LIFE: u32 = (u32::MAX as f32 * 0.3) as u32;
+const THRESHOLD_FOR_INITIAL_LIFE: u32 = (u32::MAX as f32 * 0.5) as u32;
 
 #[derive(Resource)]
 struct StepTimer(Timer);
@@ -39,8 +39,8 @@ fn setup_world(
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut rng: ResMut<GlobalEntropy<WyRand>>,
 ) {
-    let live_color_handle = materials.add(Color::GREEN);
-    let dead_color_handle = materials.add(Color::PURPLE);
+    let live_color_handle = materials.add(Color::BLACK);
+    let dead_color_handle = materials.add(Color::GRAY);
 
     let cell_live_color = CellLiveColor(live_color_handle.clone());
     let cell_dead_color = CellDeadColor(dead_color_handle.clone());
@@ -112,16 +112,16 @@ fn render_world(
     let dull_world = q_dull_world.iter().next().unwrap();
     for (mut entity, cell) in q_entities.iter_mut() {
         if dull_world.is_live(cell.row_index, cell.col_index) {
-            *entity = q_dead_cell_color.0.clone();
-        } else {
             *entity = q_live_cell_color.0.clone();
+        } else {
+            *entity = q_dead_cell_color.0.clone();
         };
     }
 }
 
 fn main() {
     App::new()
-        .insert_resource(StepTimer(Timer::from_seconds(0.2, TimerMode::Repeating)))
+        .insert_resource(StepTimer(Timer::from_seconds(0.4, TimerMode::Repeating)))
         .add_plugins((DullLifeWindowPlugin, EntropyPlugin::<WyRand>::default()))
         .add_systems(Startup, setup_world)
         .add_systems(Update, update_world)
